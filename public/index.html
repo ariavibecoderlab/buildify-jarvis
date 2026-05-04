@@ -334,37 +334,17 @@ RULES:
 - For Islamic apps: include appropriate Islamic greetings and design elements.`;
 
   try {
-    // Try server-side proxy first
-    let response;
-    const serverRes = await fetch('/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system: systemPrompt,
-        max_tokens: 8000,
-        messages: [{ role: 'user', content: `Build this app: ${prompt}` }]
-      })
-    });
-
-    if (serverRes.ok) {
-      const data = await serverRes.json();
-      if (data.content && data.content[0]) {
-        handleSuccess(data.content[0].text, thinkMsg, prompt);
-        return;
-      }
-    }
-
-    // Fallback: browser key
     const browserKey = localStorage.getItem('buildify_api_key');
-    if (!browserKey) throw new Error('No API key configured. Click ⚙ API Key to add yours.');
+    if (!browserKey) throw new Error('No API key configured. Click ⚙ API Key button (top right) to add yours.');
 
-    log('Using browser API key as fallback...', 'warn');
+    log('Calling Anthropic API...', 'info');
     const browserRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': browserKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
