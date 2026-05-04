@@ -4,420 +4,403 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Buildify — AI App Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #0a0a0f;
-  --surface: #111118;
-  --surface2: #1a1a24;
-  --border: #2a2a3a;
-  --accent: #00d4aa;
-  --accent2: #7c6af7;
-  --red: #ff4d6d;
-  --text: #e8e8f0;
-  --muted: #666680;
-  --mono: 'Space Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
+  --bg:#080810;--surface:#0f0f1a;--surface2:#161625;--surface3:#1e1e30;
+  --border:#252538;--border2:#2e2e48;--accent:#00e5b0;--accent2:#8b7cf8;
+  --accent3:#ff6b9d;--yellow:#ffd166;--red:#ff4d6d;--text:#eeeef5;
+  --muted:#5a5a78;--muted2:#8888aa;--mono:'Space Mono',monospace;--sans:'Sora',sans-serif;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--text); font-family:var(--sans); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
-
-/* TOP BAR */
-.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:52px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
-.logo { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--accent); letter-spacing:-1px; }
-.logo span { color:var(--accent2); }
-.badge { font-family:var(--mono); font-size:10px; background:var(--accent2); color:#fff; padding:2px 8px; border-radius:20px; margin-left:8px; }
-.status-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; margin-right:6px; animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.status-text { font-size:12px; color:var(--muted); font-family:var(--mono); }
-.topbar-right { display:flex; gap:10px; align-items:center; }
-.btn { padding:6px 14px; border-radius:6px; font-size:12px; font-family:var(--mono); cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text); transition:all 0.2s; }
-.btn:hover { border-color:var(--accent); color:var(--accent); }
-.btn-primary { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
-.btn-primary:hover { background:#00ffcc; color:#000; border-color:#00ffcc; }
-
-/* MAIN LAYOUT */
-.main { display:flex; flex:1; overflow:hidden; }
-
-/* LEFT PANEL */
-.left-panel { width:280px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
-.panel-header { padding:14px 16px; border-bottom:1px solid var(--border); font-size:11px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:1px; display:flex; justify-content:space-between; align-items:center; }
-.prompt-area { flex:1; padding:16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
-.prompt-label { font-size:11px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; }
-textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--sans); font-size:13px; padding:12px; resize:none; height:140px; line-height:1.5; transition:border 0.2s; }
-textarea:focus { outline:none; border-color:var(--accent); }
-textarea::placeholder { color:var(--muted); }
-.quick-prompts { display:flex; flex-direction:column; gap:6px; }
-.quick-btn { padding:8px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--muted); font-size:11px; font-family:var(--sans); cursor:pointer; text-align:left; transition:all 0.2s; line-height:1.4; }
-.quick-btn:hover { border-color:var(--accent); color:var(--text); background:rgba(0,212,170,0.05); }
-.launch-btn { margin:0 16px 16px; padding:12px; background:var(--accent); color:#000; border:none; border-radius:8px; font-family:var(--mono); font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-.launch-btn:hover { background:#00ffcc; transform:translateY(-1px); }
-.launch-btn:disabled { background:var(--surface2); color:var(--muted); cursor:not-allowed; transform:none; }
-.cost-panel { padding:12px 16px; border-top:1px solid var(--border); font-size:11px; font-family:var(--mono); }
-.cost-row { display:flex; justify-content:space-between; color:var(--muted); margin-bottom:4px; }
-.cost-row.total { color:var(--accent); font-weight:700; margin-top:4px; padding-top:4px; border-top:1px solid var(--border); }
-
-/* CENTER */
-.center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-.tabs { display:flex; background:var(--surface); border-bottom:1px solid var(--border); padding:0 16px; gap:2px; flex-shrink:0; }
-.tab { padding:10px 16px; font-size:12px; font-family:var(--mono); color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
-.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-.tab:hover { color:var(--text); }
-.code-panel { flex:1; overflow:auto; padding:20px; display:none; }
-.code-panel.active { display:block; }
-pre { font-family:var(--mono); font-size:12px; line-height:1.7; color:#a8d8a8; white-space:pre-wrap; word-break:break-all; }
-.preview-panel { flex:1; overflow:hidden; display:none; background:#fff; }
-.preview-panel.active { display:block; }
-.preview-panel iframe { width:100%; height:100%; border:none; }
-.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:16px; color:var(--muted); }
-.empty-icon { font-size:48px; opacity:0.3; }
-.empty-title { font-family:var(--mono); font-size:14px; }
-.empty-sub { font-size:12px; text-align:center; max-width:300px; line-height:1.6; }
-
-/* TERMINAL */
-.terminal { height:180px; background:#050508; border-top:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
-.terminal-header { padding:8px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; }
-.terminal-title { font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; gap:8px; }
-.term-dot { width:6px; height:6px; border-radius:50%; }
-.clear-btn { font-size:11px; font-family:var(--mono); color:var(--muted); background:none; border:none; cursor:pointer; }
-.clear-btn:hover { color:var(--text); }
-.terminal-body { flex:1; overflow-y:auto; padding:10px 16px; font-family:var(--mono); font-size:11px; line-height:1.8; }
-.log-line { margin-bottom:1px; }
-.log-time { color:var(--muted); margin-right:8px; }
-.log-info { color:var(--accent); }
-.log-error { color:var(--red); }
-.log-warn { color:#ffd166; }
-.log-success { color:#06d6a0; }
-.log-build { color:var(--accent2); }
-
-/* RIGHT PANEL */
-.right-panel { width:320px; background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
-.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
-.msg { display:flex; gap:10px; align-items:flex-start; }
-.msg-avatar { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; font-family:var(--mono); }
-.msg-jarvis .msg-avatar { background:rgba(0,212,170,0.15); color:var(--accent); border:1px solid rgba(0,212,170,0.3); }
-.msg-user .msg-avatar { background:rgba(124,106,247,0.15); color:var(--accent2); border:1px solid rgba(124,106,247,0.3); }
-.msg-content { flex:1; }
-.msg-name { font-size:10px; font-family:var(--mono); color:var(--muted); margin-bottom:4px; }
-.msg-text { font-size:12px; line-height:1.6; color:var(--text); background:var(--surface2); padding:10px 12px; border-radius:8px; border:1px solid var(--border); }
-.msg-jarvis .msg-text { border-color:rgba(0,212,170,0.2); }
-.download-btn { margin:0 16px 16px; padding:10px; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:8px; font-family:var(--mono); font-size:12px; cursor:pointer; transition:all 0.2s; display:none; }
-.download-btn:hover { border-color:var(--accent2); color:var(--accent2); }
-.download-btn.visible { display:block; }
-
-/* SCROLLBARS */
-::-webkit-scrollbar { width:4px; height:4px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
-
-/* THINKING ANIMATION */
-.thinking { display:inline-flex; gap:4px; align-items:center; }
-.thinking span { width:4px; height:4px; border-radius:50%; background:var(--accent); animation:bounce 1s infinite; }
-.thinking span:nth-child(2) { animation-delay:0.15s; }
-.thinking span:nth-child(3) { animation-delay:0.3s; }
-@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;}
+.topbar{height:50px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;}
+.logo{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-1px;display:flex;align-items:center;gap:10px;}
+.logo-badge{font-size:9px;background:var(--accent2);color:#fff;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;}
+.status-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted2);background:var(--surface2);padding:4px 12px;border-radius:20px;border:1px solid var(--border);}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.tbtn{padding:5px 13px;border-radius:6px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted2);transition:all 0.2s;}
+.tbtn:hover{border-color:var(--accent);color:var(--accent);}
+.tbtn-p{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.tbtn-p:hover{background:#00ffcc;border-color:#00ffcc;}
+.main{display:flex;flex:1;overflow:hidden;}
+.left{width:270px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.panel-title{padding:12px 16px;font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.phase-tag{font-size:9px;padding:2px 8px;border-radius:10px;font-family:var(--mono);}
+.pi{background:rgba(90,90,120,0.3);color:var(--muted2);}
+.pp{background:rgba(255,209,102,0.15);color:var(--yellow);}
+.pb{background:rgba(0,229,176,0.15);color:var(--accent);}
+.prompt-area{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.fl{font-size:10px;color:var(--muted2);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:11px;resize:none;height:110px;line-height:1.6;transition:border 0.2s;}
+textarea:focus{outline:none;border-color:var(--accent);}
+textarea::placeholder{color:var(--muted);font-size:12px;}
+.ql{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;}
+.qlist{display:flex;flex-direction:column;gap:5px;}
+.qb{padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-size:11px;font-family:var(--sans);cursor:pointer;text-align:left;transition:all 0.2s;line-height:1.4;display:flex;align-items:center;gap:7px;}
+.qb:hover{border-color:var(--accent2);color:var(--text);}
+.launch-area{padding:12px 14px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+#launchBtn{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+#launchBtn:hover:not(:disabled){background:#00ffcc;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,229,176,0.3);}
+#launchBtn:disabled{background:var(--surface3);color:var(--muted);cursor:not-allowed;}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.metric{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
+.metric-label{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.metric-value{font-size:13px;font-family:var(--mono);color:var(--text);margin-top:3px;}
+.mc{grid-column:span 2;}
+.mc .metric-value{color:var(--accent);}
+.center{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 14px;flex-shrink:0;}
+.tab{padding:10px 15px;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;letter-spacing:0.5px;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{flex:1;overflow:auto;display:none;}
+.tab-panel.active{display:flex;flex-direction:column;}
+.code-wrap{flex:1;background:var(--bg);padding:18px;overflow:auto;}
+pre{font-family:var(--mono);font-size:11.5px;line-height:1.8;color:#7ec8a0;white-space:pre-wrap;word-break:break-all;}
+.preview-wrap{flex:1;background:#fff;display:flex;flex-direction:column;}
+.preview-wrap iframe{flex:1;border:none;width:100%;height:100%;display:block;}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
+.ei{font-size:40px;opacity:0.2;}
+.et{font-family:var(--mono);font-size:13px;color:var(--muted2);}
+.es{font-size:12px;color:var(--muted);text-align:center;max-width:280px;line-height:1.7;}
+.terminal{height:160px;background:#04040c;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;}
+.th{padding:7px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tdots{display:flex;gap:5px;align-items:center;}
+.tdot{width:10px;height:10px;border-radius:50%;}
+.tlabel{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:8px;letter-spacing:1px;text-transform:uppercase;}
+.tclr{font-size:10px;font-family:var(--mono);color:var(--muted);background:none;border:none;cursor:pointer;}
+.tclr:hover{color:var(--text);}
+.tbody{flex:1;overflow-y:auto;padding:8px 14px;font-family:var(--mono);font-size:10.5px;line-height:1.9;}
+.tl{display:block;}.tl-t{color:var(--muted);margin-right:10px;}
+.tl-info{color:var(--accent);}.tl-warn{color:var(--yellow);}.tl-err{color:var(--red);}
+.tl-ok{color:#06d6a0;}.tl-build{color:var(--accent2);}.tl-plan{color:var(--yellow);}
+.right{width:330px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.chat-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.chat-title{font-family:var(--mono);font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:7px;}
+.chat-cnt{font-size:10px;color:var(--muted);}
+.chat-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.msg{display:flex;gap:9px;align-items:flex-start;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--mono);}
+.jav{background:rgba(0,229,176,0.12);color:var(--accent);border:1px solid rgba(0,229,176,0.25);}
+.uav{background:rgba(139,124,248,0.12);color:var(--accent2);border:1px solid rgba(139,124,248,0.25);}
+.msg-inner{flex:1;min-width:0;}
+.msg-name{font-size:9px;font-family:var(--mono);color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.bubble{font-size:12px;line-height:1.7;color:var(--text);background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--border);word-break:break-word;}
+.jb{border-color:rgba(0,229,176,0.15);}
+.ub{border-color:rgba(139,124,248,0.15);}
+.plan-card{background:var(--surface3);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-top:4px;font-size:12px;line-height:1.7;}
+.plan-card h4{font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.pr{display:flex;justify-content:space-between;margin-bottom:5px;color:var(--muted2);}
+.pr strong{color:var(--text);}
+.pf{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;font-size:11px;color:var(--muted2);}
+.pf::before{content:'✓';color:var(--accent);font-family:var(--mono);flex-shrink:0;}
+.pdiv{height:1px;background:var(--border);margin:10px 0;}
+.plan-actions{display:flex;gap:8px;margin-top:10px;}
+.pa-ok{flex:1;padding:9px;background:var(--accent);color:#000;border:none;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.pa-ok:hover{background:#00ffcc;}
+.pa-no{flex:1;padding:9px;background:transparent;color:var(--muted2);border:1px solid var(--border2);border-radius:7px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.2s;}
+.pa-no:hover{border-color:var(--red);color:var(--red);}
+.qcard{background:var(--surface3);border:1px solid rgba(255,209,102,0.2);border-radius:10px;padding:14px;margin-top:4px;}
+.qcard h4{font-family:var(--mono);font-size:10px;color:var(--yellow);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+.qi{margin-bottom:10px;}
+.qt{font-size:12px;color:var(--text);margin-bottom:6px;line-height:1.5;}
+.qopts{display:flex;flex-wrap:wrap;gap:5px;}
+.qopt{padding:4px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;font-size:11px;color:var(--muted2);cursor:pointer;transition:all 0.2s;font-family:var(--mono);}
+.qopt:hover,.qopt.sel{border-color:var(--accent2);color:var(--accent2);background:rgba(139,124,248,0.1);}
+.qsub{width:100%;margin-top:10px;padding:8px;background:var(--accent2);color:#fff;border:none;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.qsub:hover{background:#a08fff;}
+.dl-btn{margin:0 14px 14px;padding:9px;background:var(--surface2);color:var(--muted2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.2s;display:none;text-align:center;}
+.dl-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.dl-btn.show{display:block;}
+.thinking{display:inline-flex;gap:3px;align-items:center;padding:2px 0;}
+.thinking i{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;animation:bob 1s infinite;}
+.thinking i:nth-child(2){animation-delay:0.15s;background:var(--accent2);}
+.thinking i:nth-child(3){animation-delay:0.3s;background:var(--accent3);}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:24px;width:380px;max-width:90vw;}
+.modal h3{font-family:var(--mono);font-size:13px;color:var(--accent);margin-bottom:6px;}
+.modal p{font-size:12px;color:var(--muted2);margin-bottom:14px;line-height:1.6;}
+.modal input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;margin-bottom:12px;}
+.modal input:focus{outline:none;border-color:var(--accent);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;}
 </style>
 </head>
 <body>
-
 <div class="topbar">
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="logo">build<span>ify</span></div>
-    <div class="badge">JARVIS v2.1</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span class="status-dot" id="statusDot"></span>
-    <span class="status-text" id="statusText">JARVIS ready</span>
-  </div>
-  <div class="topbar-right">
-    <button class="btn" onclick="showApiModal()">⚙ API Key</button>
-    <button class="btn btn-primary" id="deployBtn" onclick="deployApp()" style="display:none">↑ Deploy</button>
+  <div class="logo">buildify<div class="logo-badge">JARVIS v3</div></div>
+  <div class="status-pill"><div class="sdot"></div><span id="statusText">JARVIS ready</span></div>
+  <div class="topbar-actions">
+    <button class="tbtn" onclick="openModal()">⚙ API Key</button>
+    <button class="tbtn tbtn-p" id="deployBtn" style="display:none" onclick="onDeploy()">↑ Deploy</button>
   </div>
 </div>
-
 <div class="main">
-  <!-- LEFT -->
-  <div class="left-panel">
-    <div class="panel-header">
-      <span>🤖 AGENT PLAN</span>
-      <span id="planStatus">—</span>
-    </div>
+  <div class="left">
+    <div class="panel-title"><span>Describe Your App</span><span class="phase-tag pi" id="phaseTag">IDLE</span></div>
     <div class="prompt-area">
-      <div class="prompt-label">Describe your app</div>
-      <textarea id="promptInput" placeholder="Describe your app... (English or BM)&#10;&#10;e.g. Build a DRE Coffee loyalty app with referral tracking and points system"></textarea>
-      <div class="prompt-label">Quick starts</div>
-      <div class="quick-prompts">
-        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a DRE Coffee loyalty rewards app with QR check-in, points tracker, and 5-tier referral system">☕ DRE Coffee Loyalty App</button>
-        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a Brainy Bunch student progress tracker with attendance, grades, and parent portal for Islamic Montessori school">📚 Brainy Bunch Student Tracker</button>
-        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a halal food delivery app with menu, cart, order tracking, and DuitNow payment">🍔 Halal Food Delivery App</button>
-        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a Muslim daily ibadah tracker with Solat, Quran, dzikir counters, streaks, and Hijri calendar">🕌 Muslim Ibadah Tracker</button>
-        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a staff birthday gifts management system with employee database, automated reminders, and gift budget tracker">🎁 Staff Birthday Gifts Manager</button>
+      <div>
+        <div class="fl">What do you want to build?</div>
+        <textarea id="promptInput" placeholder="e.g. Build a DRE Coffee loyalty app with points, referral and leaderboard&#10;&#10;JARVIS will ask questions, plan, estimate cost and time — then build only after you approve."></textarea>
+      </div>
+      <div>
+        <div class="ql">Quick Starts</div>
+        <div class="qlist">
+          <button class="qb" onclick="setP(this.dataset.p)" data-p="Build a DRE Coffee loyalty rewards app with QR check-in, points tracker, 5-tier referral system, cashback wallet and leaderboard"><span>☕</span> DRE Coffee Loyalty App</button>
+          <button class="qb" onclick="setP(this.dataset.p)" data-p="Build a Brainy Bunch student progress tracker with attendance, grades, ibadah log and parent portal for Islamic Montessori preschool"><span>📚</span> Brainy Bunch Tracker</button>
+          <button class="qb" onclick="setP(this.dataset.p)" data-p="Build a halal food delivery app with menu, cart, order tracking, DuitNow payment and rider tracking"><span>🍔</span> Halal Food Delivery</button>
+          <button class="qb" onclick="setP(this.dataset.p)" data-p="Build a Muslim daily ibadah tracker with Solat, Quran pages, dzikir counter, fasting log, streak system and Hijri calendar"><span>🕌</span> Muslim Ibadah Tracker</button>
+          <button class="qb" onclick="setP(this.dataset.p)" data-p="Build a staff birthday gifts management system with employee database, WhatsApp reminders, gift budget tracker and approval workflow"><span>🎁</span> Staff Birthday Manager</button>
+        </div>
       </div>
     </div>
-    <button class="launch-btn" id="launchBtn" onclick="launchJarvis()">
-      <span>⚡</span> Launch JARVIS
-    </button>
-    <div class="cost-panel">
-      <div class="cost-row"><span>AI tokens used</span><span id="tokensUsed">—</span></div>
-      <div class="cost-row"><span>Build time</span><span id="buildTime">—</span></div>
-      <div class="cost-row total"><span>Platform credit</span><span>RM 0.00</span></div>
+    <div class="launch-area">
+      <button id="launchBtn" onclick="startFlow()"><span>⚡</span> Launch JARVIS</button>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Tokens</div><div class="metric-value" id="mTokens">—</div></div>
+        <div class="metric"><div class="metric-label">Build Time</div><div class="metric-value" id="mTime">—</div></div>
+        <div class="metric mc"><div class="metric-label">Platform Credit Used</div><div class="metric-value">RM 0.00</div></div>
+      </div>
     </div>
   </div>
-
-  <!-- CENTER -->
   <div class="center">
     <div class="tabs">
       <div class="tab active" onclick="switchTab('code')" id="tab-code">index.html</div>
-      <div class="tab" onclick="switchTab('preview')" id="tab-preview">⬡ Preview</div>
+      <div class="tab" onclick="switchTab('preview')" id="tab-preview">⬡ Live Preview</div>
     </div>
-
-    <div class="code-panel active" id="panel-code">
-      <div class="empty-state" id="emptyCode">
-        <div class="empty-icon">⬡</div>
-        <div class="empty-title">// JARVIS Autonomous Developer</div>
-        <div class="empty-sub">Describe your app and click Launch JARVIS. I'll plan, build, and preview your app in seconds.</div>
+    <div class="tab-panel active" id="panel-code">
+      <div class="code-wrap">
+        <div class="empty-state" id="emptyCode">
+          <div class="ei">⬡</div>
+          <div class="et">// Waiting for instructions</div>
+          <div class="es">JARVIS will plan your app, ask questions, present a full build plan with cost and time estimate — then build only after you approve.</div>
+        </div>
+        <pre id="codeOut" style="display:none"></pre>
       </div>
-      <pre id="codeOutput" style="display:none"></pre>
     </div>
-
-    <div class="preview-panel" id="panel-preview">
-      <div class="empty-state" id="emptyPreview" style="background:var(--bg)">
-        <div class="empty-icon">◻</div>
-        <div class="empty-title">Preview loads here</div>
+    <div class="tab-panel" id="panel-preview">
+      <div class="preview-wrap">
+        <div class="empty-state" id="emptyPreview" style="background:var(--bg)">
+          <div class="ei">◻</div><div class="et">Preview loads after build</div>
+        </div>
+        <iframe id="previewFrame" style="display:none"></iframe>
       </div>
-      <iframe id="previewFrame" style="display:none"></iframe>
     </div>
-
     <div class="terminal">
-      <div class="terminal-header">
-        <div class="terminal-title">
-          <div class="term-dot" style="background:#ff5f57"></div>
-          <div class="term-dot" style="background:#febc2e"></div>
-          <div class="term-dot" style="background:#28c840"></div>
-          <span style="margin-left:4px">JARVIS TERMINAL</span>
+      <div class="th">
+        <div style="display:flex;align-items:center">
+          <div class="tdots"><div class="tdot" style="background:#ff5f57"></div><div class="tdot" style="background:#febc2e"></div><div class="tdot" style="background:#28c840"></div></div>
+          <span class="tlabel">JARVIS Terminal</span>
         </div>
-        <button class="clear-btn" onclick="clearLog()">Clear</button>
+        <button class="tclr" onclick="clearLog()">Clear</button>
       </div>
-      <div class="terminal-body" id="termLog">
-        <div class="log-line"><span class="log-time">00:00:00</span><span class="log-info">JARVIS Autonomous Agent initialized. Claude Sonnet 4 backend.</span></div>
-        <div class="log-line"><span class="log-time">00:00:00</span><span class="log-success">System ready. Awaiting project description.</span></div>
+      <div class="tbody" id="termLog">
+        <span class="tl"><span class="tl-t">00:00:00</span><span class="tl-info">JARVIS v3.0 — Plan → Question → Approve → Build</span></span>
+        <span class="tl"><span class="tl-t">00:00:00</span><span class="tl-ok">Claude Sonnet 4.6 backend ready.</span></span>
       </div>
     </div>
   </div>
-
-  <!-- RIGHT -->
-  <div class="right-panel">
-    <div class="panel-header">
-      <span>🤖 JARVIS</span>
-      <span id="msgCount">0 messages</span>
+  <div class="right">
+    <div class="chat-hdr">
+      <div class="chat-title">🤖 <span style="color:var(--accent)">JARVIS</span></div>
+      <div class="chat-cnt" id="chatCnt">1 message</div>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="msg msg-jarvis">
-        <div class="msg-avatar">J</div>
-        <div class="msg-content">
-          <div class="msg-name">JARVIS · Just now</div>
-          <div class="msg-text">Good day. I'm <strong style="color:var(--accent)">JARVIS</strong> — your autonomous AI software developer.<br><br>I think, plan, build, test and debug continuously. Tell me what you want to build, sir.</div>
+    <div class="chat-body" id="chatBody">
+      <div class="msg">
+        <div class="av jav">J</div>
+        <div class="msg-inner">
+          <div class="msg-name">JARVIS · Now</div>
+          <div class="bubble jb">Good day. I'm <strong style="color:var(--accent)">JARVIS</strong> — your autonomous AI developer.<br><br>
+            Before writing any code, I will:<br>
+            <span style="color:var(--accent)">①</span> Understand your requirements<br>
+            <span style="color:var(--accent2)">②</span> Ask clarifying questions<br>
+            <span style="color:var(--yellow)">③</span> Present a full plan with time &amp; cost estimate<br>
+            <span style="color:#06d6a0">④</span> Build only after you approve<br><br>
+            Tell me what you want to build, sir.
+          </div>
         </div>
       </div>
     </div>
-    <button class="download-btn" id="downloadBtn" onclick="downloadApp()">⬇ Download App as HTML</button>
+    <button class="dl-btn" id="dlBtn" onclick="downloadApp()">⬇ Download App as HTML</button>
   </div>
 </div>
-
-<!-- API Modal -->
-<div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:none;align-items:center;justify-content:center">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:400px;max-width:90vw">
-    <h3 style="font-family:var(--mono);font-size:14px;margin-bottom:16px;color:var(--accent)">⚙ API Configuration</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Enter your Anthropic API key. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></p>
-    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;margin-bottom:12px"/>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button onclick="closeApiModal()" class="btn">Cancel</button>
-      <button onclick="saveApiKey()" class="btn btn-primary">Save Key</button>
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <h3>⚙ API Key</h3>
+    <p>Enter your Anthropic API key. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></p>
+    <input type="password" id="apiInput" placeholder="sk-ant-api03-..."/>
+    <div class="modal-actions">
+      <button class="tbtn" onclick="closeModal()">Cancel</button>
+      <button class="tbtn tbtn-p" onclick="saveKey()">Save Key</button>
     </div>
   </div>
 </div>
-
 <script>
-let builtCode = '';
-let startTime = null;
-let msgCount = 1;
-let buildTimer = null;
-
-// Load saved API key
-const savedKey = localStorage.getItem('buildify_api_key');
-if (savedKey) log('API key loaded from browser storage.', 'info');
-
-function setPrompt(p) { document.getElementById('promptInput').value = p; }
-
-function log(msg, type='info') {
-  const now = new Date();
-  const t = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2,'0')).join(':');
-  const el = document.createElement('div');
-  el.className = 'log-line';
-  el.innerHTML = `<span class="log-time">${t}</span><span class="log-${type}">${msg}</span>`;
-  const term = document.getElementById('termLog');
-  term.appendChild(el);
-  term.scrollTop = term.scrollHeight;
+let phase='idle',builtCode='',buildStart=null,buildTimer=null,msgCount=1,pendingPlan=null,qAnswers={};
+function setP(p){document.getElementById('promptInput').value=p;}
+function ts(){const n=new Date();return[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');}
+function log(msg,type='info'){const el=document.createElement('span');el.className='tl';el.innerHTML=`<span class="tl-t">${ts()}</span><span class="tl-${type}">${msg}</span>`;const t=document.getElementById('termLog');t.appendChild(el);t.scrollTop=t.scrollHeight;}
+function clearLog(){document.getElementById('termLog').innerHTML='';}
+function setPhase(p){
+  phase=p;
+  const tag=document.getElementById('phaseTag');
+  const m={idle:['IDLE','pi'],planning:['PLANNING','pp'],questioning:['Q&A','pp'],approving:['REVIEW','pp'],building:['BUILDING','pb'],done:['DONE','pb']};
+  tag.textContent=m[p][0];tag.className='phase-tag '+m[p][1];
+  document.getElementById('statusText').textContent={idle:'JARVIS ready',planning:'Analysing...',questioning:'Asking questions',approving:'Awaiting approval',building:'Building...',done:'Build complete'}[p];
 }
-
-function clearLog() { document.getElementById('termLog').innerHTML = ''; }
-
-function addChat(text, isUser=false) {
-  msgCount++;
-  document.getElementById('msgCount').textContent = msgCount + ' messages';
-  const chat = document.getElementById('chatMessages');
-  const div = document.createElement('div');
-  div.className = `msg ${isUser ? 'msg-user' : 'msg-jarvis'}`;
-  div.innerHTML = `
-    <div class="msg-avatar">${isUser ? 'U' : 'J'}</div>
-    <div class="msg-content">
-      <div class="msg-name">${isUser ? 'You' : 'JARVIS'} · Just now</div>
-      <div class="msg-text">${text}</div>
-    </div>`;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-  return div;
+function addMsg(html,isUser=false){
+  msgCount++;document.getElementById('chatCnt').textContent=msgCount+' messages';
+  const w=document.createElement('div');w.className='msg';
+  w.innerHTML=`<div class="av ${isUser?'uav':'jav'}">${isUser?'U':'J'}</div><div class="msg-inner"><div class="msg-name">${isUser?'You':'JARVIS'} · Now</div><div class="bubble ${isUser?'ub':'jb'}">${html}</div></div>`;
+  const b=document.getElementById('chatBody');b.appendChild(w);b.scrollTop=b.scrollHeight;
+  return w.querySelector('.bubble');
 }
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.code-panel, .preview-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
-  document.getElementById(`panel-${tab}`).classList.add('active');
+function thinkMsg(){return addMsg('<div class="thinking"><i></i><i></i><i></i></div>');}
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
 }
-
-function showApiModal() {
-  const modal = document.getElementById('apiModal');
-  modal.style.display = 'flex';
-  const saved = localStorage.getItem('buildify_api_key');
-  if (saved) document.getElementById('apiKeyInput').value = saved;
+function openModal(){document.getElementById('modal').classList.add('open');const k=localStorage.getItem('bfy_key');if(k)document.getElementById('apiInput').value=k;}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function saveKey(){const k=document.getElementById('apiInput').value.trim();if(k){localStorage.setItem('bfy_key',k);log('API key saved.','ok');}closeModal();}
+function getKey(){return localStorage.getItem('bfy_key')||'';}
+async function callClaude(sys,msg,maxTok=10000){
+  const key=getKey();
+  if(!key)throw new Error('No API key. Click ⚙ API Key button.');
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTok,system:sys,messages:[{role:'user',content:msg}]})
+  });
+  const d=await r.json();
+  if(!r.ok)throw new Error(d.error?.message||`API error ${r.status}`);
+  return d.content[0].text;
 }
-function closeApiModal() { document.getElementById('apiModal').style.display = 'none'; }
-function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (key) { localStorage.setItem('buildify_api_key', key); log('Browser API key saved.', 'success'); }
-  closeApiModal();
-}
-
-async function launchJarvis() {
-  const prompt = document.getElementById('promptInput').value.trim();
-  if (!prompt) { log('No project description provided.', 'warn'); return; }
-
-  const btn = document.getElementById('launchBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
-
-  document.getElementById('statusText').textContent = 'JARVIS building...';
-  startTime = Date.now();
-
-  buildTimer = setInterval(() => {
-    document.getElementById('buildTime').textContent = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
-  }, 100);
-
-  log(`NEW PROJECT: ${prompt.substring(0, 60)}...`, 'build');
-  log('Phase 1: Planning architecture...', 'build');
-  addChat(prompt, true);
-
-  const thinkMsg = addChat('<div class="thinking"><span></span><span></span><span></span></div> Analysing requirements and planning build...');
-
-  const systemPrompt = `You are JARVIS, an elite autonomous AI software developer. Build complete, beautiful, production-ready single-file HTML apps.
-
-RULES:
-- Return ONLY raw HTML code. No markdown, no backticks, no explanation.
-- The HTML must be complete and self-contained with all CSS and JS inline.
-- Make it beautiful, modern, mobile-responsive.
-- Use real functionality — working forms, buttons, state, local storage where needed.
-- Include a header with the app name.
-- Use a dark or light theme appropriate for the app.
-- Make it feel like a real product, not a demo.
-- For Malaysian apps: support BM/English, use RM for currency, include DuitNow references where relevant.
-- For Islamic apps: include appropriate Islamic greetings and design elements.`;
-
-  try {
-    const browserKey = localStorage.getItem('buildify_api_key');
-    if (!browserKey) throw new Error('No API key configured. Click ⚙ API Key button (top right) to add yours.');
-
-    log('Calling Anthropic API...', 'info');
-    const browserRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': browserKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: `Build this app: ${prompt}` }]
-      })
-    });
-
-    const bData = await browserRes.json();
-    if (!browserRes.ok) throw new Error(bData.error?.message || `API error ${browserRes.status}`);
-    handleSuccess(bData.content[0].text, thinkMsg, prompt);
-
-  } catch (err) {
-    clearInterval(buildTimer);
-    log(`ERROR: ${err.message}`, 'error');
-    thinkMsg.querySelector('.msg-text').innerHTML = `❌ Error: ${err.message}`;
-    document.getElementById('statusText').textContent = 'JARVIS ready';
-    btn.disabled = false;
-    btn.innerHTML = '<span>⚡</span> Launch JARVIS';
+async function startFlow(){
+  const prompt=document.getElementById('promptInput').value.trim();
+  if(!prompt){log('No description provided.','warn');return;}
+  if(!getKey()){openModal();return;}
+  const btn=document.getElementById('launchBtn');
+  btn.disabled=true;btn.innerHTML='<div class="thinking"><i></i><i></i><i></i></div>';
+  addMsg(prompt,true);setPhase('planning');
+  log(`NEW PROJECT: ${prompt.substring(0,60)}...`,'build');
+  log('Phase 1: Analysing requirements...','plan');
+  const thinking=thinkMsg();
+  try{
+    const sys=`You are JARVIS, an elite AI developer. Analyse this app request and generate clarifying questions.
+Return ONLY valid JSON (no markdown, no backticks):
+{"questions":[{"q":"Question?","options":["A","B","C"]}],"app_name":"Name","summary":"One sentence","features":["f1","f2","f3","f4","f5"]}`;
+    const raw=await callClaude(sys,`Client request: ${prompt}`,2000);
+    let data;
+    try{data=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){throw new Error('Plan parse failed. Try again.');}
+    pendingPlan=data;setPhase('questioning');
+    log('Questions generated.','plan');
+    thinking.innerHTML=`<div class="qcard"><h4>🔍 Quick Questions</h4><p style="font-size:11px;color:var(--muted2);margin-bottom:12px">Help me build exactly what you need:</p>${data.questions.map((q,i)=>`<div class="qi"><div class="qt">${i+1}. ${q.q}</div><div class="qopts">${q.options.map(o=>`<button class="qopt" onclick="selOpt(this,${i},'${o.replace(/'/g,"\\'")}')">${o}</button>`).join('')}</div></div>`).join('')}<button class="qsub" onclick="submitQ()">Submit & See Build Plan →</button></div>`;
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Launch JARVIS';
+  }catch(err){
+    thinking.innerHTML=`❌ ${err.message}`;log('ERROR: '+err.message,'err');setPhase('idle');
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Launch JARVIS';
   }
 }
-
-function handleSuccess(code, thinkMsg, prompt) {
-  clearInterval(buildTimer);
-  builtCode = code.trim();
-
-  // Show code
-  document.getElementById('emptyCode').style.display = 'none';
-  const codeEl = document.getElementById('codeOutput');
-  codeEl.style.display = 'block';
-  codeEl.textContent = builtCode;
-
-  // Show preview
-  const frame = document.getElementById('previewFrame');
-  document.getElementById('emptyPreview').style.display = 'none';
-  frame.style.display = 'block';
-  frame.srcdoc = builtCode;
-
-  // Update UI
-  const tokens = Math.round(builtCode.length / 4);
-  document.getElementById('tokensUsed').textContent = tokens.toLocaleString();
-  document.getElementById('planStatus').textContent = '✓ Done';
-  document.getElementById('statusText').textContent = 'JARVIS ready';
-  document.getElementById('deployBtn').style.display = 'block';
-  document.getElementById('downloadBtn').classList.add('visible');
-
-  thinkMsg.querySelector('.msg-text').innerHTML = `✅ App built successfully! <strong>${tokens.toLocaleString()} tokens</strong> used.<br><br>Switch to <strong>⬡ Preview</strong> tab to see it live. Click <strong>⬇ Download</strong> to save it.`;
-
-  log(`BUILD COMPLETE. ${builtCode.length} chars, ~${tokens} tokens.`, 'success');
-  log('Preview rendered. App ready.', 'success');
-
-  const btn = document.getElementById('launchBtn');
-  btn.disabled = false;
-  btn.innerHTML = '<span>⚡</span> Launch JARVIS';
-
-  switchTab('preview');
+function selOpt(el,i,val){el.closest('.qopts').querySelectorAll('.qopt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');qAnswers[i]=val;}
+async function submitQ(){
+  if(!pendingPlan)return;
+  const btn=document.getElementById('launchBtn');btn.disabled=true;
+  pendingPlan.questions.forEach((_,i)=>{if(!qAnswers[i])qAnswers[i]=pendingPlan.questions[i].options[0];});
+  setPhase('approving');log('Generating final build plan...','plan');
+  const answers=pendingPlan.questions.map((q,i)=>`${q.q}: ${qAnswers[i]}`).join('\n');
+  const thinking=thinkMsg();
+  try{
+    const sys=`You are JARVIS. Generate a final build plan based on client answers.
+Return ONLY valid JSON (no markdown):
+{"app_name":"Name","summary":"Description","features":["f1","f2","f3","f4","f5","f6"],"tech":"HTML+CSS+JS (single file)","est_time":"60-120 seconds","est_tokens":"6000-8000","complexity":"Medium","screens":["s1","s2","s3"],"note":"Build approach note"}`;
+    const prompt=document.getElementById('promptInput').value;
+    const raw=await callClaude(sys,`Request: ${prompt}\nAnswers:\n${answers}`,2000);
+    let plan;
+    try{plan=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){plan={app_name:pendingPlan.app_name,summary:pendingPlan.summary,features:pendingPlan.features,tech:'HTML+CSS+JS',est_time:'60-120s',est_tokens:'6000-8000',complexity:'Medium',note:'Building as requested.'};}
+    pendingPlan.final=plan;
+    log('Plan ready. Awaiting approval...','plan');
+    const planId='plan_'+Date.now();
+    window[planId]=plan;
+    thinking.innerHTML=`<div class="plan-card"><h4>📋 Build Plan — ${plan.app_name}</h4><div class="pr"><span>App</span><strong>${plan.app_name}</strong></div><div class="pr"><span>Complexity</span><strong>${plan.complexity}</strong></div><div class="pr"><span>Est. Build Time</span><strong style="color:var(--yellow)">${plan.est_time}</strong></div><div class="pr"><span>Est. Tokens</span><strong>${plan.est_tokens}</strong></div><div class="pr"><span>Tech Stack</span><strong>${plan.tech}</strong></div><div class="pdiv"></div><div style="font-size:11px;color:var(--muted2);margin-bottom:8px">${plan.summary}</div><div>${plan.features.map(f=>`<div class="pf">${f}</div>`).join('')}</div><div class="pdiv"></div><div style="font-size:10px;color:var(--muted);font-family:var(--mono)">${plan.note}</div><div class="plan-actions"><button class="pa-no" onclick="rejectPlan()">✕ Revise</button><button class="pa-ok" onclick="approvePlan('${planId}')">✓ Approve & Build</button></div></div>`;
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Launch JARVIS';
+  }catch(err){
+    thinking.innerHTML=`❌ ${err.message}`;log('ERROR: '+err.message,'err');setPhase('idle');
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Launch JARVIS';
+  }
 }
-
-function downloadApp() {
-  if (!builtCode) return;
-  const blob = new Blob([builtCode], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'buildify-app.html';
-  a.click();
-  log('App downloaded as HTML file.', 'success');
+function rejectPlan(){
+  setPhase('idle');qAnswers={};pendingPlan=null;
+  addMsg("No problem! Update your description on the left and I'll start fresh with a new plan.");
+  log('Plan rejected. Ready for revision.','warn');
 }
-
-function deployApp() {
-  addChat('Your app is ready to deploy! Share the downloaded HTML file, or I can help you deploy it to Netlify Drop (drag & drop at netlify.com/drop) for a free live URL in 30 seconds. 🚀');
-  log('Deploy options shown in chat.', 'info');
+async function approvePlan(planId){
+  const plan=window[planId];
+  setPhase('building');
+  const btn=document.getElementById('launchBtn');btn.disabled=true;btn.innerHTML='<div class="thinking"><i></i><i></i><i></i></div>';
+  addMsg('✅ Plan approved! Starting build now...');
+  log('Plan approved. Generating code...','ok');
+  buildStart=Date.now();
+  buildTimer=setInterval(()=>{document.getElementById('mTime').textContent=((Date.now()-buildStart)/1000).toFixed(1)+'s';},100);
+  const thinking=thinkMsg();
+  try{
+    const prompt=document.getElementById('promptInput').value;
+    const answers=pendingPlan?.questions?.map((q,i)=>`${q.q}: ${qAnswers[i]||q.options[0]}`).join(', ')||'';
+    const sys=`You are JARVIS. Build a complete, beautiful, fully-functional single-file HTML app.
+RULES:
+- Return ONLY raw HTML. No markdown, no backticks, no explanation.
+- Single file: all CSS and JS inline.
+- BEAUTIFUL UI — professional design, smooth animations, cohesive color scheme.
+- FULLY FUNCTIONAL — all buttons work, data saves to localStorage, real features.
+- Mobile responsive.
+- Proper header with app name and icon.
+- Use Google Fonts.
+- Malaysian apps: RM currency, DuitNow where relevant, BM/English.
+- Islamic apps: appropriate Islamic elements, Hijri calendar where relevant.
+- Build REAL functionality — not placeholders.
+- Must look like a product someone would pay for.`;
+    const html=await callClaude(sys,`Build this: ${prompt}\nPreferences: ${answers}`);
+    clearInterval(buildTimer);
+    builtCode=html.replace(/^```html\n?/,'').replace(/\n?```$/,'').trim();
+    const tokens=Math.round(builtCode.length/4);
+    document.getElementById('mTokens').textContent=tokens.toLocaleString();
+    document.getElementById('emptyCode').style.display='none';
+    const co=document.getElementById('codeOut');co.textContent=builtCode;co.style.display='block';
+    document.getElementById('emptyPreview').style.display='none';
+    const fr=document.getElementById('previewFrame');fr.srcdoc=builtCode;fr.style.display='block';
+    setPhase('done');
+    document.getElementById('deployBtn').style.display='block';
+    document.getElementById('dlBtn').classList.add('show');
+    thinking.innerHTML=`🚀 <strong>Build complete!</strong><br><br><strong style="color:var(--accent)">${tokens.toLocaleString()} tokens</strong> · <strong style="color:var(--yellow)">${((Date.now()-buildStart)/1000).toFixed(1)}s</strong><br><br>Check <strong>⬡ Live Preview</strong> to test it. Click <strong>⬇ Download</strong> to save.`;
+    log(`DONE. ${builtCode.length} chars, ~${tokens} tokens.`,'ok');
+    setTimeout(()=>switchTab('preview'),800);
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Rebuild';
+  }catch(err){
+    clearInterval(buildTimer);
+    thinking.innerHTML=`❌ ${err.message}`;log('ERROR: '+err.message,'err');setPhase('idle');
+    btn.disabled=false;btn.innerHTML='<span>⚡</span> Launch JARVIS';
+  }
 }
+function downloadApp(){
+  if(!builtCode)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([builtCode],{type:'text/html'}));
+  a.download=(pendingPlan?.final?.app_name||'buildify-app').replace(/\s+/g,'-').toLowerCase()+'.html';
+  a.click();log('App downloaded.','ok');
+}
+function onDeploy(){
+  addMsg(`Your app is ready to go live!<br><br><strong>Free in 30 seconds:</strong><br>① Download your app below<br>② Go to <a href="https://app.netlify.com/drop" target="_blank" style="color:var(--accent)">netlify.com/drop</a><br>③ Drag & drop your HTML file<br>④ Get a free live URL instantly 🚀`);
+}
+if(getKey())log('API key loaded from storage.','ok');
 </script>
 </body>
 </html>
