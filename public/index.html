@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Buildify — AI App Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: #2a2a3a;
+  --accent: #00d4aa;
+  --accent2: #7c6af7;
+  --red: #ff4d6d;
+  --text: #e8e8f0;
+  --muted: #666680;
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:var(--sans); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+/* TOP BAR */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:52px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.logo { font-family:var(--mono); font-size:18px; font-weight:700; color:var(--accent); letter-spacing:-1px; }
+.logo span { color:var(--accent2); }
+.badge { font-family:var(--mono); font-size:10px; background:var(--accent2); color:#fff; padding:2px 8px; border-radius:20px; margin-left:8px; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; margin-right:6px; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-text { font-size:12px; color:var(--muted); font-family:var(--mono); }
+.topbar-right { display:flex; gap:10px; align-items:center; }
+.btn { padding:6px 14px; border-radius:6px; font-size:12px; font-family:var(--mono); cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text); transition:all 0.2s; }
+.btn:hover { border-color:var(--accent); color:var(--accent); }
+.btn-primary { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
+.btn-primary:hover { background:#00ffcc; color:#000; border-color:#00ffcc; }
+
+/* MAIN LAYOUT */
+.main { display:flex; flex:1; overflow:hidden; }
+
+/* LEFT PANEL */
+.left-panel { width:280px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+.panel-header { padding:14px 16px; border-bottom:1px solid var(--border); font-size:11px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:1px; display:flex; justify-content:space-between; align-items:center; }
+.prompt-area { flex:1; padding:16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
+.prompt-label { font-size:11px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; }
+textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--sans); font-size:13px; padding:12px; resize:none; height:140px; line-height:1.5; transition:border 0.2s; }
+textarea:focus { outline:none; border-color:var(--accent); }
+textarea::placeholder { color:var(--muted); }
+.quick-prompts { display:flex; flex-direction:column; gap:6px; }
+.quick-btn { padding:8px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--muted); font-size:11px; font-family:var(--sans); cursor:pointer; text-align:left; transition:all 0.2s; line-height:1.4; }
+.quick-btn:hover { border-color:var(--accent); color:var(--text); background:rgba(0,212,170,0.05); }
+.launch-btn { margin:0 16px 16px; padding:12px; background:var(--accent); color:#000; border:none; border-radius:8px; font-family:var(--mono); font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.launch-btn:hover { background:#00ffcc; transform:translateY(-1px); }
+.launch-btn:disabled { background:var(--surface2); color:var(--muted); cursor:not-allowed; transform:none; }
+.cost-panel { padding:12px 16px; border-top:1px solid var(--border); font-size:11px; font-family:var(--mono); }
+.cost-row { display:flex; justify-content:space-between; color:var(--muted); margin-bottom:4px; }
+.cost-row.total { color:var(--accent); font-weight:700; margin-top:4px; padding-top:4px; border-top:1px solid var(--border); }
+
+/* CENTER */
+.center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.tabs { display:flex; background:var(--surface); border-bottom:1px solid var(--border); padding:0 16px; gap:2px; flex-shrink:0; }
+.tab { padding:10px 16px; font-size:12px; font-family:var(--mono); color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab:hover { color:var(--text); }
+.code-panel { flex:1; overflow:auto; padding:20px; display:none; }
+.code-panel.active { display:block; }
+pre { font-family:var(--mono); font-size:12px; line-height:1.7; color:#a8d8a8; white-space:pre-wrap; word-break:break-all; }
+.preview-panel { flex:1; overflow:hidden; display:none; background:#fff; }
+.preview-panel.active { display:block; }
+.preview-panel iframe { width:100%; height:100%; border:none; }
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:16px; color:var(--muted); }
+.empty-icon { font-size:48px; opacity:0.3; }
+.empty-title { font-family:var(--mono); font-size:14px; }
+.empty-sub { font-size:12px; text-align:center; max-width:300px; line-height:1.6; }
+
+/* TERMINAL */
+.terminal { height:180px; background:#050508; border-top:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+.terminal-header { padding:8px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-shrink:0; }
+.terminal-title { font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+.term-dot { width:6px; height:6px; border-radius:50%; }
+.clear-btn { font-size:11px; font-family:var(--mono); color:var(--muted); background:none; border:none; cursor:pointer; }
+.clear-btn:hover { color:var(--text); }
+.terminal-body { flex:1; overflow-y:auto; padding:10px 16px; font-family:var(--mono); font-size:11px; line-height:1.8; }
+.log-line { margin-bottom:1px; }
+.log-time { color:var(--muted); margin-right:8px; }
+.log-info { color:var(--accent); }
+.log-error { color:var(--red); }
+.log-warn { color:#ffd166; }
+.log-success { color:#06d6a0; }
+.log-build { color:var(--accent2); }
+
+/* RIGHT PANEL */
+.right-panel { width:320px; background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+.msg { display:flex; gap:10px; align-items:flex-start; }
+.msg-avatar { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; font-family:var(--mono); }
+.msg-jarvis .msg-avatar { background:rgba(0,212,170,0.15); color:var(--accent); border:1px solid rgba(0,212,170,0.3); }
+.msg-user .msg-avatar { background:rgba(124,106,247,0.15); color:var(--accent2); border:1px solid rgba(124,106,247,0.3); }
+.msg-content { flex:1; }
+.msg-name { font-size:10px; font-family:var(--mono); color:var(--muted); margin-bottom:4px; }
+.msg-text { font-size:12px; line-height:1.6; color:var(--text); background:var(--surface2); padding:10px 12px; border-radius:8px; border:1px solid var(--border); }
+.msg-jarvis .msg-text { border-color:rgba(0,212,170,0.2); }
+.download-btn { margin:0 16px 16px; padding:10px; background:var(--surface2); color:var(--text); border:1px solid var(--border); border-radius:8px; font-family:var(--mono); font-size:12px; cursor:pointer; transition:all 0.2s; display:none; }
+.download-btn:hover { border-color:var(--accent2); color:var(--accent2); }
+.download-btn.visible { display:block; }
+
+/* SCROLLBARS */
+::-webkit-scrollbar { width:4px; height:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* THINKING ANIMATION */
+.thinking { display:inline-flex; gap:4px; align-items:center; }
+.thinking span { width:4px; height:4px; border-radius:50%; background:var(--accent); animation:bounce 1s infinite; }
+.thinking span:nth-child(2) { animation-delay:0.15s; }
+.thinking span:nth-child(3) { animation-delay:0.3s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="logo">build<span>ify</span></div>
+    <div class="badge">JARVIS v2.1</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="status-dot" id="statusDot"></span>
+    <span class="status-text" id="statusText">JARVIS ready</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn" onclick="showApiModal()">⚙ API Key</button>
+    <button class="btn btn-primary" id="deployBtn" onclick="deployApp()" style="display:none">↑ Deploy</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="panel-header">
+      <span>🤖 AGENT PLAN</span>
+      <span id="planStatus">—</span>
+    </div>
+    <div class="prompt-area">
+      <div class="prompt-label">Describe your app</div>
+      <textarea id="promptInput" placeholder="Describe your app... (English or BM)&#10;&#10;e.g. Build a DRE Coffee loyalty app with referral tracking and points system"></textarea>
+      <div class="prompt-label">Quick starts</div>
+      <div class="quick-prompts">
+        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a DRE Coffee loyalty rewards app with QR check-in, points tracker, and 5-tier referral system">☕ DRE Coffee Loyalty App</button>
+        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a Brainy Bunch student progress tracker with attendance, grades, and parent portal for Islamic Montessori school">📚 Brainy Bunch Student Tracker</button>
+        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a halal food delivery app with menu, cart, order tracking, and DuitNow payment">🍔 Halal Food Delivery App</button>
+        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a Muslim daily ibadah tracker with Solat, Quran, dzikir counters, streaks, and Hijri calendar">🕌 Muslim Ibadah Tracker</button>
+        <button class="quick-btn" onclick="setPrompt(this.dataset.p)" data-p="Build a staff birthday gifts management system with employee database, automated reminders, and gift budget tracker">🎁 Staff Birthday Gifts Manager</button>
+      </div>
+    </div>
+    <button class="launch-btn" id="launchBtn" onclick="launchJarvis()">
+      <span>⚡</span> Launch JARVIS
+    </button>
+    <div class="cost-panel">
+      <div class="cost-row"><span>AI tokens used</span><span id="tokensUsed">—</span></div>
+      <div class="cost-row"><span>Build time</span><span id="buildTime">—</span></div>
+      <div class="cost-row total"><span>Platform credit</span><span>RM 0.00</span></div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('code')" id="tab-code">index.html</div>
+      <div class="tab" onclick="switchTab('preview')" id="tab-preview">⬡ Preview</div>
+    </div>
+
+    <div class="code-panel active" id="panel-code">
+      <div class="empty-state" id="emptyCode">
+        <div class="empty-icon">⬡</div>
+        <div class="empty-title">// JARVIS Autonomous Developer</div>
+        <div class="empty-sub">Describe your app and click Launch JARVIS. I'll plan, build, and preview your app in seconds.</div>
+      </div>
+      <pre id="codeOutput" style="display:none"></pre>
+    </div>
+
+    <div class="preview-panel" id="panel-preview">
+      <div class="empty-state" id="emptyPreview" style="background:var(--bg)">
+        <div class="empty-icon">◻</div>
+        <div class="empty-title">Preview loads here</div>
+      </div>
+      <iframe id="previewFrame" style="display:none"></iframe>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <div class="term-dot" style="background:#ff5f57"></div>
+          <div class="term-dot" style="background:#febc2e"></div>
+          <div class="term-dot" style="background:#28c840"></div>
+          <span style="margin-left:4px">JARVIS TERMINAL</span>
+        </div>
+        <button class="clear-btn" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="terminal-body" id="termLog">
+        <div class="log-line"><span class="log-time">00:00:00</span><span class="log-info">JARVIS Autonomous Agent initialized. Claude Sonnet 4 backend.</span></div>
+        <div class="log-line"><span class="log-time">00:00:00</span><span class="log-success">System ready. Awaiting project description.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="panel-header">
+      <span>🤖 JARVIS</span>
+      <span id="msgCount">0 messages</span>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg msg-jarvis">
+        <div class="msg-avatar">J</div>
+        <div class="msg-content">
+          <div class="msg-name">JARVIS · Just now</div>
+          <div class="msg-text">Good day. I'm <strong style="color:var(--accent)">JARVIS</strong> — your autonomous AI software developer.<br><br>I think, plan, build, test and debug continuously. Tell me what you want to build, sir.</div>
+        </div>
+      </div>
+    </div>
+    <button class="download-btn" id="downloadBtn" onclick="downloadApp()">⬇ Download App as HTML</button>
+  </div>
+</div>
+
+<!-- API Modal -->
+<div id="apiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:400px;max-width:90vw">
+    <h3 style="font-family:var(--mono);font-size:14px;margin-bottom:16px;color:var(--accent)">⚙ API Configuration</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Enter your Anthropic API key. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></p>
+    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;margin-bottom:12px"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeApiModal()" class="btn">Cancel</button>
+      <button onclick="saveApiKey()" class="btn btn-primary">Save Key</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let builtCode = '';
+let startTime = null;
+let msgCount = 1;
+let buildTimer = null;
+
+// Load saved API key
+const savedKey = localStorage.getItem('buildify_api_key');
+if (savedKey) log('API key loaded from browser storage.', 'info');
+
+function setPrompt(p) { document.getElementById('promptInput').value = p; }
+
+function log(msg, type='info') {
+  const now = new Date();
+  const t = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2,'0')).join(':');
+  const el = document.createElement('div');
+  el.className = 'log-line';
+  el.innerHTML = `<span class="log-time">${t}</span><span class="log-${type}">${msg}</span>`;
+  const term = document.getElementById('termLog');
+  term.appendChild(el);
+  term.scrollTop = term.scrollHeight;
+}
+
+function clearLog() { document.getElementById('termLog').innerHTML = ''; }
+
+function addChat(text, isUser=false) {
+  msgCount++;
+  document.getElementById('msgCount').textContent = msgCount + ' messages';
+  const chat = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${isUser ? 'msg-user' : 'msg-jarvis'}`;
+  div.innerHTML = `
+    <div class="msg-avatar">${isUser ? 'U' : 'J'}</div>
+    <div class="msg-content">
+      <div class="msg-name">${isUser ? 'You' : 'JARVIS'} · Just now</div>
+      <div class="msg-text">${text}</div>
+    </div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.code-panel, .preview-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+function showApiModal() {
+  const modal = document.getElementById('apiModal');
+  modal.style.display = 'flex';
+  const saved = localStorage.getItem('buildify_api_key');
+  if (saved) document.getElementById('apiKeyInput').value = saved;
+}
+function closeApiModal() { document.getElementById('apiModal').style.display = 'none'; }
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key) { localStorage.setItem('buildify_api_key', key); log('Browser API key saved.', 'success'); }
+  closeApiModal();
+}
+
+async function launchJarvis() {
+  const prompt = document.getElementById('promptInput').value.trim();
+  if (!prompt) { log('No project description provided.', 'warn'); return; }
+
+  const btn = document.getElementById('launchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+
+  document.getElementById('statusText').textContent = 'JARVIS building...';
+  startTime = Date.now();
+
+  buildTimer = setInterval(() => {
+    document.getElementById('buildTime').textContent = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+  }, 100);
+
+  log(`NEW PROJECT: ${prompt.substring(0, 60)}...`, 'build');
+  log('Phase 1: Planning architecture...', 'build');
+  addChat(prompt, true);
+
+  const thinkMsg = addChat('<div class="thinking"><span></span><span></span><span></span></div> Analysing requirements and planning build...');
+
+  const systemPrompt = `You are JARVIS, an elite autonomous AI software developer. Build complete, beautiful, production-ready single-file HTML apps.
+
+RULES:
+- Return ONLY raw HTML code. No markdown, no backticks, no explanation.
+- The HTML must be complete and self-contained with all CSS and JS inline.
+- Make it beautiful, modern, mobile-responsive.
+- Use real functionality — working forms, buttons, state, local storage where needed.
+- Include a header with the app name.
+- Use a dark or light theme appropriate for the app.
+- Make it feel like a real product, not a demo.
+- For Malaysian apps: support BM/English, use RM for currency, include DuitNow references where relevant.
+- For Islamic apps: include appropriate Islamic greetings and design elements.`;
+
+  try {
+    // Try server-side proxy first
+    let response;
+    const serverRes = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: systemPrompt,
+        max_tokens: 8000,
+        messages: [{ role: 'user', content: `Build this app: ${prompt}` }]
+      })
+    });
+
+    if (serverRes.ok) {
+      const data = await serverRes.json();
+      if (data.content && data.content[0]) {
+        handleSuccess(data.content[0].text, thinkMsg, prompt);
+        return;
+      }
+    }
+
+    // Fallback: browser key
+    const browserKey = localStorage.getItem('buildify_api_key');
+    if (!browserKey) throw new Error('No API key configured. Click ⚙ API Key to add yours.');
+
+    log('Using browser API key as fallback...', 'warn');
+    const browserRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': browserKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Build this app: ${prompt}` }]
+      })
+    });
+
+    const bData = await browserRes.json();
+    if (!browserRes.ok) throw new Error(bData.error?.message || `API error ${browserRes.status}`);
+    handleSuccess(bData.content[0].text, thinkMsg, prompt);
+
+  } catch (err) {
+    clearInterval(buildTimer);
+    log(`ERROR: ${err.message}`, 'error');
+    thinkMsg.querySelector('.msg-text').innerHTML = `❌ Error: ${err.message}`;
+    document.getElementById('statusText').textContent = 'JARVIS ready';
+    btn.disabled = false;
+    btn.innerHTML = '<span>⚡</span> Launch JARVIS';
+  }
+}
+
+function handleSuccess(code, thinkMsg, prompt) {
+  clearInterval(buildTimer);
+  builtCode = code.trim();
+
+  // Show code
+  document.getElementById('emptyCode').style.display = 'none';
+  const codeEl = document.getElementById('codeOutput');
+  codeEl.style.display = 'block';
+  codeEl.textContent = builtCode;
+
+  // Show preview
+  const frame = document.getElementById('previewFrame');
+  document.getElementById('emptyPreview').style.display = 'none';
+  frame.style.display = 'block';
+  frame.srcdoc = builtCode;
+
+  // Update UI
+  const tokens = Math.round(builtCode.length / 4);
+  document.getElementById('tokensUsed').textContent = tokens.toLocaleString();
+  document.getElementById('planStatus').textContent = '✓ Done';
+  document.getElementById('statusText').textContent = 'JARVIS ready';
+  document.getElementById('deployBtn').style.display = 'block';
+  document.getElementById('downloadBtn').classList.add('visible');
+
+  thinkMsg.querySelector('.msg-text').innerHTML = `✅ App built successfully! <strong>${tokens.toLocaleString()} tokens</strong> used.<br><br>Switch to <strong>⬡ Preview</strong> tab to see it live. Click <strong>⬇ Download</strong> to save it.`;
+
+  log(`BUILD COMPLETE. ${builtCode.length} chars, ~${tokens} tokens.`, 'success');
+  log('Preview rendered. App ready.', 'success');
+
+  const btn = document.getElementById('launchBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<span>⚡</span> Launch JARVIS';
+
+  switchTab('preview');
+}
+
+function downloadApp() {
+  if (!builtCode) return;
+  const blob = new Blob([builtCode], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'buildify-app.html';
+  a.click();
+  log('App downloaded as HTML file.', 'success');
+}
+
+function deployApp() {
+  addChat('Your app is ready to deploy! Share the downloaded HTML file, or I can help you deploy it to Netlify Drop (drag & drop at netlify.com/drop) for a free live URL in 30 seconds. 🚀');
+  log('Deploy options shown in chat.', 'info');
+}
+</script>
+</body>
+</html>
